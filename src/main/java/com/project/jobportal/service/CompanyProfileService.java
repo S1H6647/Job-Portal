@@ -44,6 +44,12 @@ public class CompanyProfileService {
         return CompanyProfileResponse.from(companyProfile);
     }
 
+    public CompanyProfileResponse getProfileByOwner(UserPrincipal userPrincipal) {
+        var companyProfile = companyProfileRepository.findByOwner(userPrincipal.getUser())
+                .orElseThrow(() -> new MoreThanOneCompanyException("Company profile not found"));
+        return CompanyProfileResponse.from(companyProfile);
+    }
+
     public CompanyProfileResponse updateCompanyProfile(Long companyId, CompanyProfileRequest request, UserPrincipal userPrincipal) throws AccessDeniedException {
         var companyProfile = utilService.findCompanyById(companyId);
 

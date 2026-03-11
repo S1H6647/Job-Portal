@@ -1,9 +1,7 @@
 package com.project.jobportal.service;
 
-import com.project.jobportal.domain.Application;
-import com.project.jobportal.domain.CompanyProfile;
-import com.project.jobportal.domain.JobPosting;
-import com.project.jobportal.domain.JobStatus;
+import com.project.jobportal.domain.*;
+import com.project.jobportal.exception.AuthorityException;
 import com.project.jobportal.repository.ApplicationRepository;
 import com.project.jobportal.repository.JobPostingRepository;
 import com.project.jobportal.security.user.UserPrincipal;
@@ -12,6 +10,7 @@ import com.project.jobportal.web.dto.application.ApplicationStatusRequest;
 import com.project.jobportal.web.dto.employer.job.JobRequest;
 import com.project.jobportal.web.dto.employer.job.JobResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
 import java.time.Instant;
@@ -38,6 +37,10 @@ public class JobService {
             throw new AccessDeniedException("You are not authorized to post jobs for this company");
         }
 
+        if (company.getStatus() != ProfileStatus.APPROVED) {
+            throw new AuthorityException("Your company profile must be approved by an administrator before you can post jobs.");
+        }
+
         JobPosting job = new JobPosting();
         job.setCompany(company);
         job.setTitle(request.title());
@@ -56,6 +59,25 @@ public class JobService {
     public List<JobResponse> getAllActiveJobs() {
         var jobPosting = jobPostingRepository.findByStatus(JobStatus.ACTIVE);
         return jobPosting.stream()
+                .map(JobResponse::from)
+                .toList();
+    }
+
+    public JobResponse getJobById(Long jobId) {
+        var job = utilService.findJobById(jobId);
+        return JobResponse.from(job);
+    }
+
+    public List<JobResponse> getJobsByEmployer(UserPrincipal userPrincipal) {
+        var user = userPrincipal.getUser();
+        var company = user.getCompanyProfile();
+
+        if (company == null) {
+            return List.of();
+        }
+
+        var jobs = jobPostingRepository.findByCompany(company);
+        return jobs.stream()
                 .map(JobResponse::from)
                 .toList();
     }
@@ -119,6 +141,7 @@ public class JobService {
     }
 
 
+    @Transactional(readOnly = true)
     public List<ApplicantResponse> getAllApplications(Long jobId) {
         var job = utilService.findJobById(jobId);
 
@@ -129,6 +152,7 @@ public class JobService {
                 .toList();
     }
 
+    @Transactional
     public ApplicantResponse updateApplicationStatus(Long jobId, Long applicationId, ApplicationStatusRequest statusRequest) {
         utilService.findJobById(jobId);
 

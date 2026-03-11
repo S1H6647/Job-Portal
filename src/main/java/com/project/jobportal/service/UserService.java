@@ -1,6 +1,7 @@
 package com.project.jobportal.service;
 
 import com.project.jobportal.domain.User;
+import com.project.jobportal.exception.ResourceNotFoundException;
 import com.project.jobportal.repository.UserRepository;
 import com.project.jobportal.security.jwt.JwtUtil;
 import com.project.jobportal.security.user.UserPrincipal;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -63,5 +65,11 @@ public class UserService {
         return userList.stream()
                 .map(UserResponse::from)
                 .toList();
+    }
+
+    public void deleteUser(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        userRepository.delete(user);
     }
 }
