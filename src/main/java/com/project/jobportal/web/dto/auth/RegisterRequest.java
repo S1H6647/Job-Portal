@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record RegisterRequest(
+        @NotBlank(message = "Name cannot be blank")
+        String name,
 
         @Email(message = "Invalid email format")
         @NotBlank(message = "Email cannot be blank")

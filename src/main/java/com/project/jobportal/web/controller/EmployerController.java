@@ -38,6 +38,14 @@ public class EmployerController {
         return ResponseEntity.status(201).body(response);
     }
 
+    @GetMapping("/profile")
+    public ResponseEntity<CompanyProfileResponse> getProfile(
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        var response = companyProfileService.getProfileByOwner(userPrincipal);
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/profile/{companyId}")
     public ResponseEntity<CompanyProfileResponse> updateCompanyProfile(
             @PathVariable Long companyId,
@@ -59,8 +67,10 @@ public class EmployerController {
     }
 
     @GetMapping("/jobs")
-    public ResponseEntity<List<JobResponse>> viewMyJobs() {
-        var response = jobService.getAllActiveJobs();
+    public ResponseEntity<List<JobResponse>> viewMyJobs(
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        var response = jobService.getJobsByEmployer(userPrincipal);
         return ResponseEntity.ok(response);
     }
 

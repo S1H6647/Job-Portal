@@ -5,6 +5,8 @@ import com.project.jobportal.exception.ResourceNotFoundException;
 import com.project.jobportal.repository.*;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UtilService {
 
@@ -47,8 +49,7 @@ public class UtilService {
                 .orElseThrow(() -> new ResourceNotFoundException("Candidate profile not found"));
     }
 
-    protected Application findApplicationByCandidate(User candidate) {
-        return applicationRepository.findApplicationsByCandidate(candidate)
-                .orElseThrow(() -> new ResourceNotFoundException("You have currently no application"));
+    protected List<Application> findApplicationsByCandidate(User candidate) {
+        return applicationRepository.findApplicationsByCandidate(candidate);
     }
 }

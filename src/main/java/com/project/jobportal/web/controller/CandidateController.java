@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/candidate")
@@ -63,11 +64,11 @@ public class CandidateController {
     }
 
     // - `GET /candidate/applications` - View my applications
-    @GetMapping("/application")
-    public ResponseEntity<ApplicantResponse> viewMyApplication(
+    @GetMapping("/applications")
+    public ResponseEntity<List<ApplicantResponse>> viewMyApplications(
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        var response = candidateProfileService.viewMyApplication(userPrincipal);
+        var response = candidateProfileService.viewMyApplications(userPrincipal);
         return ResponseEntity.ok(response);
     }
 

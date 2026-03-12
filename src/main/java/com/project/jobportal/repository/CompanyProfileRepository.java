@@ -14,4 +14,6 @@ public interface CompanyProfileRepository extends JpaRepository<CompanyProfile, 
     boolean existsByOwner(User owner);
 
     List<CompanyProfile> findByStatus(ProfileStatus status);
+
+    Optional<CompanyProfile> findByOwner(User owner);
 }

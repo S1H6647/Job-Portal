@@ -1,10 +1,10 @@
-package com.project.jobprotal;
+package com.project.jobportal;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class JobProtalApplicationTests {
+class JobPortalApplicationTests {
 
     @Test
     void contextLoads() {

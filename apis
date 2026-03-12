@@ -1,0 +1,56 @@
+# Current Project APIs
+
+## 🔓 Public Endpoints
+- `GET /jobs` - Browse all jobs
+- `GET /company` - View approved companies
+
+## 🔐 Auth Endpoints (`/auth`)
+- `POST /auth/register` - Register (CANDIDATE or EMPLOYER)
+- `POST /auth/login` - Login -> returns JWT
+
+## 👤 Candidate Endpoints (`/candidate`)
+- `POST /candidate/profile` - Create candidate profile
+- `PUT /candidate/profile/{profileId}` - Update candidate profile
+- `POST /candidate/resume` - Upload resume (PDF, multipart)
+- `POST /candidate/jobs/{jobId}/apply` - Apply to a job
+
+## 🏢 Employer Endpoints (`/employer`)
+- `POST /employer/profile` - Create company profile
+- `PUT /employer/profile/{companyId}` - Update company profile
+- `POST /employer/jobs/{companyId}` - Post a new job
+- `GET /employer/jobs` - View all posted jobs
+- `PUT /employer/jobs/{companyId}/{jobId}` - Edit a job post
+- `DELETE /employer/jobs/{companyId}/{jobId}` - Delete a job post
+- `GET /employer/jobs/{jobId}/applicants` - View applicants for a job
+- `PUT /employer/jobs/{jobId}/applicants/{applicationId}` - Update application status
+
+## 🛡️ Admin Endpoints (`/admin`)
+- `GET /admin/all-users` - List all users
+- `GET /admin/all-companies` - List all approved companies
+- `GET /admin/companies/pending` - View all companies pending approval
+- `PUT /admin/companies/{companyId}/approve` - Approve a company
+- `PUT /admin/companies/{companyId}/reject` - Reject a company
+- `GET /admin/jobs/pending` - View all jobs pending approval
+- `PUT /admin/jobs/{jobId}/approve` - Approve a job post
+- `PUT /admin/jobs/{jobId}/reject` - Reject a job post
+- `GET /admin/users` - (Current is `/admin/users`)
+
+---
+
+# Missing APIs (from screenshots)
+
+### 🔓 Public
+- `GET /public/jobs/{jobId}` - View single job detail
+- `GET /public/jobs/search` - Search by skill/location/category
+- `GET /public/companies/{companyId}` - View specific company profile
+*(Note: Current public endpoints are not prefixed with `/public`)*
+
+### 👤 Candidate
+- `GET /candidate/applications` - View my applications
+
+### 🏢 Employer
+- Many employer endpoints currently require `companyId` in the path, whereas the screenshots suggest using the logged-in user's context for a cleaner API
+(e.g., `/employer/jobs/{jobId}` instead of `/employer/jobs/{companyId}/{jobId}`).
+
+### 🛡️ Admin
+- `DELETE /admin/users/{userId}` - Delete a user

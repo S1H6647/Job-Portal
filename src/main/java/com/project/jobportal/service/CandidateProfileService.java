@@ -17,12 +17,9 @@ import com.project.jobportal.web.dto.candidate.CandidateProfileResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.List;
 
 @Service
 public class CandidateProfileService {
@@ -30,11 +27,13 @@ public class CandidateProfileService {
     private final CandidateProfileRepository candidateProfileRepository;
     private final UtilService utilService;
     private final ApplicationRepository applicationRepository;
+    private final StorageService storageService;
 
-    public CandidateProfileService(CandidateProfileRepository candidateProfileRepository, UtilService utilService, ApplicationRepository applicationRepository) {
+    public CandidateProfileService(CandidateProfileRepository candidateProfileRepository, UtilService utilService, ApplicationRepository applicationRepository, StorageService storageService) {
         this.candidateProfileRepository = candidateProfileRepository;
         this.utilService = utilService;
         this.applicationRepository = applicationRepository;
+        this.storageService = storageService;
     }
 
     public CandidateProfileResponse createProfile(CandidateProfileRequest request, UserPrincipal userPrincipal) {
@@ -78,26 +77,19 @@ public class CandidateProfileService {
     }
 
     public String uploadResume(MultipartFile file, UserPrincipal userPrincipal) throws IOException {
-        String uploadDir = "src/main/java/com/project/jobportal/uploads";
-        File directory = new File(uploadDir);
-        if (!directory.exists()) {
-            System.out.println(directory.mkdirs());
-        }
-        Path filePath = Paths.get(uploadDir + "/" + file.getOriginalFilename());
-        Files.write(filePath, file.getBytes());
-
+        String resumeUrl = storageService.uploadResume(file);
         var user = userPrincipal.getUser();
         var application = user.getCandidateProfile();
-        application.setResumeUrl(filePath.toString());
+        application.setResumeUrl(resumeUrl);
         candidateProfileRepository.save(application);
 
         return "File successfully uploaded";
     }
 
-    public ApplicantResponse viewMyApplication(UserPrincipal userPrincipal) {
-        var application = utilService.findApplicationByCandidate(userPrincipal.getUser());
+    public List<ApplicantResponse> viewMyApplications(UserPrincipal userPrincipal) {
+        var applications = utilService.findApplicationsByCandidate(userPrincipal.getUser());
 
-        return ApplicantResponse.from(application);
+        return applications.stream().map(ApplicantResponse::from).toList();
     }
 
     public ApplicantResponse applyToJob(Long jobId, UserPrincipal userPrincipal, ApplicationRequest request) {

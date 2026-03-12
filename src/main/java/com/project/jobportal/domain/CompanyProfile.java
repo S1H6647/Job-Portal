@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -28,4 +31,7 @@ public class CompanyProfile {
 
     @Enumerated(EnumType.STRING)
     private ProfileStatus status;         // PENDING, APPROVED, REJECTED (admin approves)
+
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<JobPosting> jobs = new ArrayList<>();
 }

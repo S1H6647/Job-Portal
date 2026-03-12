@@ -6,6 +6,7 @@ import com.project.jobportal.web.dto.employer.companyProfile.CompanyProfileRespo
 import com.project.jobportal.web.dto.employer.job.JobResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -24,6 +25,11 @@ public class PublicController {
     @GetMapping("/jobs")
     public ResponseEntity<List<JobResponse>> getAllActiveJobs() {
         return ResponseEntity.ok(jobService.getAllActiveJobs());
+    }
+
+    @GetMapping("/jobs/{jobId}")
+    public ResponseEntity<JobResponse> getJobById(@PathVariable Long jobId) {
+        return ResponseEntity.ok(jobService.getJobById(jobId));
     }
 
     @GetMapping("/company")

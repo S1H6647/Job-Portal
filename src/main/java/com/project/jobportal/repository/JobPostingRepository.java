@@ -1,5 +1,6 @@
 package com.project.jobportal.repository;
 
+import com.project.jobportal.domain.CompanyProfile;
 import com.project.jobportal.domain.JobPosting;
 import com.project.jobportal.domain.JobStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,6 @@ public interface JobPostingRepository extends JpaRepository<JobPosting, Long> {
     List<JobPosting> findByStatusAndExpiresAtBefore(JobStatus status, LocalDateTime expiresAtBefore);
 
     Optional<JobPosting> findJobPostingById(Long id);
+
+    List<JobPosting> findByCompany(CompanyProfile company);
 }

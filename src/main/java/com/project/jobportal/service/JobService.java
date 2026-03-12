@@ -23,11 +23,13 @@ public class JobService {
     private final JobPostingRepository jobPostingRepository;
     private final UtilService utilService;
     private final ApplicationRepository applicationRepository;
+    private final EmailService emailService;
 
-    public JobService(JobPostingRepository jobPostingRepository, UtilService utilService, ApplicationRepository applicationRepository) {
+    public JobService(JobPostingRepository jobPostingRepository, UtilService utilService, ApplicationRepository applicationRepository, EmailService emailService) {
         this.jobPostingRepository = jobPostingRepository;
         this.utilService = utilService;
         this.applicationRepository = applicationRepository;
+        this.emailService = emailService;
     }
 
     public JobResponse postJob(Long companyId, JobRequest request, UserPrincipal userPrincipal) throws AccessDeniedException {
@@ -127,6 +129,11 @@ public class JobService {
         job.setApprovedAt(LocalDateTime.now());
         job.setExpiresAt(LocalDateTime.now().plusDays(30));
 
+        var owner = job.getCompany().getOwner().getEmail();
+        var companyName = job.getCompany().getCompanyName();
+        var jobTitle = job.getTitle();
+        emailService.sendJobPostingApproved(owner, companyName, jobTitle);
+
         jobPostingRepository.save(job);
         return JobResponse.from(job);
     }
@@ -135,6 +142,11 @@ public class JobService {
         var job = utilService.findJobById(jobId);
 
         job.setStatus(JobStatus.REJECTED);
+
+        var owner = job.getCompany().getOwner().getEmail();
+        var companyName = job.getCompany().getCompanyName();
+        var jobTitle = job.getTitle();
+        emailService.sendJobPostingRejected(owner, companyName, jobTitle);
 
         jobPostingRepository.save(job);
         return JobResponse.from(job);
@@ -154,11 +166,24 @@ public class JobService {
 
     @Transactional
     public ApplicantResponse updateApplicationStatus(Long jobId, Long applicationId, ApplicationStatusRequest statusRequest) {
-        utilService.findJobById(jobId);
+        var job = utilService.findJobById(jobId);
 
         var application = utilService.findApplicationById(applicationId);
 
         application.setStatus(statusRequest.status());
+
+        String email = application.getCandidate().getEmail();
+        String candidateName = application.getCandidate().getName();
+        String jobTitle = job.getTitle();
+        String companyName = job.getCompany().getCompanyName();
+
+        if (statusRequest.status() == ApplicationStatus.HIRED) {
+            emailService.sendApplicationApproved(email, candidateName, jobTitle, companyName);
+        } else if (statusRequest.status() == ApplicationStatus.REJECTED) {
+            emailService.sendApplicationRejected(email, candidateName, jobTitle, companyName);
+        }
+
+
         applicationRepository.save(application);
         return ApplicantResponse.from(application);
     }

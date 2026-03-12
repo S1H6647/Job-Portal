@@ -13,6 +13,7 @@ public record JobResponse(
 
         Long id,
         Long companyId,
+        String companyName,
         String title,
         String description,
         String location,
@@ -28,6 +29,7 @@ public record JobResponse(
         return new JobResponse(
                 job.getId(),
                 job.getCompany() != null ? job.getCompany().getId() : null,
+                job.getCompany() != null ? job.getCompany().getCompanyName() : null,
                 job.getTitle(),
                 job.getDescription(),
                 job.getLocation(),

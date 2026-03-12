@@ -17,10 +17,12 @@ public class CompanyProfileService {
 
     private final CompanyProfileRepository companyProfileRepository;
     private final UtilService utilService;
+    private final EmailService emailService;
 
-    public CompanyProfileService(CompanyProfileRepository companyProfileRepository, UtilService utilService) {
+    public CompanyProfileService(CompanyProfileRepository companyProfileRepository, UtilService utilService, EmailService emailService) {
         this.companyProfileRepository = companyProfileRepository;
         this.utilService = utilService;
+        this.emailService = emailService;
     }
 
     public CompanyProfileResponse setUpCompany(CompanyProfileRequest request, UserPrincipal userPrincipal) {
@@ -85,6 +87,11 @@ public class CompanyProfileService {
     public CompanyProfileResponse approveCompany(Long companyId) {
         var companyProfile = utilService.findCompanyById(companyId);
         companyProfile.setStatus(ProfileStatus.APPROVED);
+
+        var owner = companyProfile.getOwner().getEmail();
+        var companyName = companyProfile.getCompanyName();
+        emailService.sendCompanyProfileApproved(owner, companyName);
+
         companyProfileRepository.save(companyProfile);
         return CompanyProfileResponse.from(companyProfile);
     }
@@ -92,6 +99,11 @@ public class CompanyProfileService {
     public CompanyProfileResponse rejectCompany(Long companyId) {
         var companyProfile = utilService.findCompanyById(companyId);
         companyProfile.setStatus(ProfileStatus.REJECTED);
+
+        var owner = companyProfile.getOwner().getEmail();
+        var companyName = companyProfile.getCompanyName();
+        emailService.sendCompanyProfileRejected(owner, companyName);
+
         companyProfileRepository.save(companyProfile);
         return CompanyProfileResponse.from(companyProfile);
     }
