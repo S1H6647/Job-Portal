@@ -44,6 +44,11 @@ public class SecurityConfiguration {
                         .requestMatchers("/jobs/**").permitAll()
                         .requestMatchers("/company/**").permitAll()
                         .requestMatchers("/company/profile").hasRole("EMPLOYER")
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**"
+                        ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
